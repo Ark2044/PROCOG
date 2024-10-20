@@ -1,5 +1,6 @@
-// page.tsx
+// risks/page.tsx
 import React from "react";
+import Link from "next/link";
 import RiskCard, { RiskStatus } from "../../components/RiskCard";
 import {
   FaExclamationTriangle,
@@ -76,12 +77,16 @@ export default function RisksPage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <h1 className="text-4xl font-bold mb-6">Risks</h1>
+      <p className="text-gray-500 mb-4">
+        These risks are view-only. You cannot edit them here.
+      </p>
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {risks.map((risk) => (
-          <RiskCard
-            key={risk.id}
-            {...risk} // Spread the risk object to pass all props, including icon
-          />
+          <Link key={risk.id} href={`/risks/${risk.id}`} passHref>
+            <div className="cursor-pointer">
+              <RiskCard {...risk} />
+            </div>
+          </Link>
         ))}
       </div>
     </div>

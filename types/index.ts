@@ -20,6 +20,7 @@ export interface Comment {
     author: string;
     content: string;
     timestamp: string;
+    reminder?: Reminder; // Optional reminder property for publishers
 }
 
 export interface Reminder {
