@@ -32,12 +32,10 @@ interface Risk {
 
 interface RiskListProps {
   userId?: string;
-  userSpecific?: boolean;
 }
 
 const RiskList: React.FC<RiskListProps> = ({
   userId,
-  userSpecific = false,
 }) => {
   const [risks, setRisks] = useState<Risk[]>([]);
   const [loading, setLoading] = useState(true);

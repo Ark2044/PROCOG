@@ -11,60 +11,52 @@ export async function POST(request: NextRequest) {
         const response = await databases.createDocument(db, solutionCollection, ID.unique(), {
             content: solution,
             authorId: authorId,
-            riskId: riskId
-        })
+            riskId: riskId,
+        });
 
         // Increase author reputation
-        const prefs = await users.getPrefs<UserPrefs>(authorId)
+        const prefs = await users.getPrefs<UserPrefs>(authorId);
         await users.updatePrefs(authorId, {
-            reputation: Number(prefs.reputation) + 1
-        })
+            reputation: Number(prefs.reputation) + 1,
+        });
 
-        return NextResponse.json(response, {
-            status: 201
-        })
+        return NextResponse.json(response, { status: 201 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Error creating answer";
+        const errorStatus = (error as { status?: number; code?: number })?.status ||
+            (error as { status?: number; code?: number })?.code ||
+            500;
 
-    } catch (error: any) {
         return NextResponse.json(
-            {
-                error: error?.message || "Error creating answer"
-            },
-            {
-                status: error?.status || error?.code || 500
-            }
-        )
+            { error: errorMessage },
+            { status: errorStatus }
+        );
     }
 }
 
 export async function DELETE(request: NextRequest) {
     try {
-        const { solutionId } = await request.json()
+        const { solutionId } = await request.json();
 
-        const answer = await databases.getDocument(db, solutionCollection, solutionId)
+        const answer = await databases.getDocument(db, solutionCollection, solutionId);
+        const response = await databases.deleteDocument(db, solutionCollection, solutionId);
 
-        const response = await databases.deleteDocument(db, solutionCollection, solutionId)
-
-        //decrese the reputation
-        const prefs = await users.getPrefs<UserPrefs>(answer.authorId)
+        // Decrease the reputation
+        const prefs = await users.getPrefs<UserPrefs>(answer.authorId);
         await users.updatePrefs(answer.authorId, {
-            reputation: Number(prefs.reputation) - 1
-        })
+            reputation: Number(prefs.reputation) - 1,
+        });
+
+        return NextResponse.json({ data: response }, { status: 200 });
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Error deleting the answer";
+        const errorStatus = (error as { status?: number; code?: number })?.status ||
+            (error as { status?: number; code?: number })?.code ||
+            500;
 
         return NextResponse.json(
-            { data: response },
-            { status: 200 }
-        )
-
-
-
-    } catch (error: any) {
-        return NextResponse.json(
-            {
-                message: error?.message || "Error deleting the answer"
-            },
-            {
-                status: error?.status || error?.code || 500
-            }
-        )
+            { message: errorMessage },
+            { status: errorStatus }
+        );
     }
 }

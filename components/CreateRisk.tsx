@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { databases, account, storage } from "@/models/client/config"; // Import Appwrite configuration
-import { riskCollection, db } from "@/models/name"; // Import risk collection name and database ID
+import { riskCollection, db, riskAttachmentBucket } from "@/models/name"; // Import risk collection name and database ID
 
 const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
   onRiskCreated,
@@ -37,7 +37,7 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
 
       // Upload file if provided
       if (file) {
-        const fileResponse = await storage.createFile("unique()", file);
+        const fileResponse = await storage.createFile(riskAttachmentBucket,"unique()", file);
         setAttachmentId(fileResponse.$id); // Set the file ID
       }
 
