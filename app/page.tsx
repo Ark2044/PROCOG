@@ -1,101 +1,137 @@
+"use client";
+import { useEffect } from "react";
+import Link from "next/link";
+import { FaChartLine, FaShieldAlt, FaUserCog } from "react-icons/fa";
 import Image from "next/image";
+import { useAuthStore } from "@/store/Auth";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const router = useRouter();
+  const { session, verifySession } = useAuthStore();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  useEffect(() => {
+    // Check for session on page load
+    verifySession();
+  }, [verifySession]);
+
+  useEffect(() => {
+    // Redirect if authenticated
+    if (session) {
+      const user = useAuthStore.getState().user; // Access user from the store
+      router.push(`/dashboard/${user?.$id}`);
+    }
+  }, [session, router]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+              Effortlessly Manage Your Risks
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Our platform empowers you to identify, assess, and mitigate risks
+              with ease. Get started today and take control of your
+              organization&apos;s future.
+            </p>
+            <div className="flex space-x-4">
+              <Link
+                href="/register"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+          <div className="flex justify-center">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/hero-illustration.svg"
+              alt="Hero Illustration"
+              className="max-w-md"
+              width={24}
+              height={24}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Features Section */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">
+            Key Features
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+              <div className="bg-blue-50 p-3 rounded-lg text-blue-600 inline-block">
+                <FaChartLine className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Advanced Analytics
+              </h3>
+              <p className="text-gray-600">
+                Gain valuable insights through our comprehensive analytics
+                dashboard, helping you make data-driven decisions.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+              <div className="bg-green-50 p-3 rounded-lg text-green-600 inline-block">
+                <FaShieldAlt className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Risk Mitigation
+              </h3>
+              <p className="text-gray-600">
+                Proactively identify and mitigate risks, ensuring your
+                organization is prepared for potential challenges.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+              <div className="bg-yellow-50 p-3 rounded-lg text-yellow-600 inline-block">
+                <FaUserCog className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Customizable Settings
+              </h3>
+              <p className="text-gray-600">
+                Tailor the platform to your unique needs with our flexible
+                settings, ensuring a seamless experience.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mt-16 bg-blue-600 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <div className="p-8 md:p-12 space-y-4">
+              <h2 className="text-3xl font-extrabold text-white">
+                Take Control of Your Risks
+              </h2>
+              <p className="text-blue-100">
+                Sign up today and start managing your risks with our powerful
+                platform. Get started in minutes.
+              </p>
+              <Link
+                href="/register"
+                className="inline-flex items-center px-6 py-3 bg-white text-blue-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors duration-200 shadow-sm hover:shadow-md"
+              >
+                Get Started
+              </Link>
+            </div>
+            <div className="hidden md:block relative">
+              <Image
+                src="/cta-illustration.svg"
+                alt="CTA Illustration"
+                className="absolute inset-0 w-full h-full object-cover"
+                width={24}
+                height={24}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
