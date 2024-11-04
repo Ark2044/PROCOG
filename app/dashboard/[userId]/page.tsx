@@ -225,7 +225,7 @@ const Dashboard = () => {
           {/* Risk List */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6">
-              <RiskList userId={userIdString} userSpecific={true} />
+              <RiskList userId={userIdString} />
             </div>
           </div>
         </div>
