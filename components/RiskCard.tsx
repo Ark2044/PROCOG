@@ -10,7 +10,7 @@ interface RiskCardProps {
   tags: string[];
   attachmentId?: string;
   impact: "low" | "medium" | "high";
-  probability: string;
+  probability: number; // Now treated as a number from 0-5
   action: "mitigate" | "accept" | "transfer" | "avoid";
   created: string;
   updated: string;
@@ -46,14 +46,14 @@ const getActionColor = (
   }
 };
 
-// Function to get color for probability (you can customize thresholds as needed)
-const getProbabilityColor = (probability: string) => {
-  if (probability === "high") {
-    return "bg-red-100 text-red-800";
-  } else if (probability === "medium") {
-    return "bg-yellow-100 text-yellow-800";
+// Function to get color for probability based on a numerical range (0-5)
+const getProbabilityColor = (probability: number) => {
+  if (probability >= 4) {
+    return "bg-red-100 text-red-800"; // High probability
+  } else if (probability >= 2) {
+    return "bg-yellow-100 text-yellow-800"; // Medium probability
   }
-  return "bg-green-100 text-green-800"; // Low or unspecified
+  return "bg-green-100 text-green-800"; // Low probability
 };
 
 const RiskCard: React.FC<RiskCardProps> = ({
@@ -84,7 +84,7 @@ const RiskCard: React.FC<RiskCardProps> = ({
               variant="outline"
               className={getProbabilityColor(probability)}
             >
-              Probability: {probability}
+              Probability: {probability * 20}%
             </Badge>
           </div>
         </div>
@@ -107,7 +107,12 @@ const RiskCard: React.FC<RiskCardProps> = ({
           </div>
 
           <div className="flex items-center gap-1">
-            {attachmentId && <Paperclip className="w-4 h-4" />}
+            {attachmentId && (
+              <>
+                <Paperclip className="w-4 h-4" />
+                <span>Attachment</span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-1">

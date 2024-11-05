@@ -1,16 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import { useAuthStore } from "@/store/Auth";
 import { useRouter } from "next/navigation"; // Updated import
 
 export default function Register() {
-  const { createAccount, login} = useAuthStore();
+  const { createAccount, login, user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter(); // Initialize router for navigation
+
+  useEffect(() => {
+    // Redirect to dashboard if user is already logged in
+    if (user) {
+      router.push(`/dashboard/${user.$id}`);
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

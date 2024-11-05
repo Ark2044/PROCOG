@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/Auth"; // Adjust this path if necessary
 import { useRouter } from "next/navigation";
+import { FaUser, FaEnvelope, FaStar } from "react-icons/fa"; // Import Font Awesome icons
 
 const Profile = () => {
   const router = useRouter();
@@ -9,7 +10,7 @@ const Profile = () => {
     useAuthStore();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [reputation, setReputation] = useState(user?.prefs?.reputation || 0);
+  const [reputation] = useState(user?.prefs?.reputation || 0); // Make reputation read-only
   const [updateError, setUpdateError] = useState("");
 
   useEffect(() => {
@@ -30,7 +31,8 @@ const Profile = () => {
     if (!result.success) {
       setUpdateError(result.error?.message || "Failed to update profile");
     } else {
-      // Optionally handle a successful update
+      // Handle a successful update (e.g., show a success message)
+      alert("Profile updated successfully!");
     }
   };
 
@@ -46,8 +48,11 @@ const Profile = () => {
         onSubmit={handleUpdate}
       >
         <div className="mb-4">
-          <label className="block text-gray-700" htmlFor="name">
-            Name
+          <label
+            className="flex items-center text-gray-700" // Using flex for labels
+            htmlFor="name"
+          >
+            <FaUser className="mr-2" /> Name
           </label>
           <input
             className="mt-1 block w-full border rounded-md p-2"
@@ -59,8 +64,11 @@ const Profile = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700" htmlFor="email">
-            Email
+          <label
+            className="flex items-center text-gray-700" // Using flex for labels
+            htmlFor="email"
+          >
+            <FaEnvelope className="mr-2" /> Email
           </label>
           <input
             className="mt-1 block w-full border rounded-md p-2"
@@ -72,21 +80,24 @@ const Profile = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700" htmlFor="reputation">
-            Reputation
+          <label
+            className="flex items-center text-gray-700" // Using flex for labels
+            htmlFor="reputation"
+          >
+            <FaStar className="mr-2" /> Reputation
           </label>
           <input
-            className="mt-1 block w-full border rounded-md p-2"
+            className="mt-1 block w-full border rounded-md p-2 bg-gray-100 cursor-not-allowed"
             type="number"
             id="reputation"
             value={reputation}
-            onChange={(e) => setReputation(Number(e.target.value))}
-            required
+            readOnly
           />
         </div>
+
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-blue-500 text-white rounded-md"
+          className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
         >
           Update Profile
         </button>

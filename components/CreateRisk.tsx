@@ -13,7 +13,7 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
     undefined
   );
   const [impact, setImpact] = useState<"low" | "medium" | "high">("low");
-  const [probability, setProbability] = useState<number>(50);
+  const [probability, setProbability] = useState<number>(3); // Set to 3 (midpoint)
   const [action, setAction] = useState<
     "mitigate" | "accept" | "transfer" | "avoid"
   >("mitigate");
@@ -37,7 +37,11 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
 
       // Upload file if provided
       if (file) {
-        const fileResponse = await storage.createFile(riskAttachmentBucket,"unique()", file);
+        const fileResponse = await storage.createFile(
+          riskAttachmentBucket,
+          "unique()",
+          file
+        );
         setAttachmentId(fileResponse.$id); // Set the file ID
       }
 
@@ -64,10 +68,14 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
       setFile(null);
       setAttachmentId(undefined);
       setImpact("low");
-      setProbability(3);
+      setProbability(3); // Set probability back to midpoint (50%)
       setAction("mitigate");
-    } catch (err) {
-      setError("Failed to create risk");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError("Failed to create risk: " + err.message);
+      } else {
+        setError("Failed to create risk: An unknown error occurred");
+      }
       console.error(err);
     } finally {
       setLoading(false);
@@ -75,11 +83,17 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-8">
-      <h2 className="text-xl font-bold mb-4">Create Risk</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <div>
-        <label htmlFor="title" className="block">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mb-8"
+    >
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Create Risk</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <div className="mb-4">
+        <label
+          htmlFor="title"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Title:
         </label>
         <input
@@ -88,11 +102,14 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <div>
-        <label htmlFor="content" className="block">
+      <div className="mb-4">
+        <label
+          htmlFor="content"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Content:
         </label>
         <textarea
@@ -100,34 +117,45 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <div>
-        <label htmlFor="tags" className="block">
+      <div className="mb-4">
+        <label
+          htmlFor="tags"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Tags:
         </label>
         <input
           type="text"
           id="tags"
           value={tags.join(",")}
-          onChange={(e) => setTags(e.target.value.split(","))}
-          className="border p-2 w-full"
+          onChange={(e) =>
+            setTags(e.target.value.split(",").map((tag) => tag.trim()))
+          }
+          className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <div>
-        <label htmlFor="file" className="block">
+      <div className="mb-4">
+        <label
+          htmlFor="file"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Attachment (optional):
         </label>
         <input
           type="file"
           id="file"
           onChange={handleFileChange}
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <div>
-        <label htmlFor="impact" className="block">
+      <div className="mb-4">
+        <label
+          htmlFor="impact"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Impact:
         </label>
         <select
@@ -136,15 +164,18 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
           onChange={(e) =>
             setImpact(e.target.value as "low" | "medium" | "high")
           }
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
       </div>
-      <div>
-        <label htmlFor="probability" className="block">
+      <div className="mb-4">
+        <label
+          htmlFor="probability"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Probability (0-5):
         </label>
         <input
@@ -156,10 +187,13 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
           onChange={(e) => setProbability(Number(e.target.value))}
           className="w-full"
         />
-        <p>Probability: {probability * 20}%</p>
+        <p className="text-gray-600">Probability: {probability * 20}%</p>
       </div>
-      <div>
-        <label htmlFor="action" className="block">
+      <div className="mb-4">
+        <label
+          htmlFor="action"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Action:
         </label>
         <select
@@ -170,7 +204,7 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
               e.target.value as "mitigate" | "accept" | "transfer" | "avoid"
             )
           }
-          className="border p-2 w-full"
+          className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="mitigate">Mitigate</option>
           <option value="accept">Accept</option>
@@ -180,7 +214,9 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
       </div>
       <button
         type="submit"
-        className="mt-4 bg-blue-500 text-white p-2 rounded"
+        className={`mt-4 w-full bg-blue-500 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
         disabled={loading}
       >
         {loading ? "Creating..." : "Create Risk"}

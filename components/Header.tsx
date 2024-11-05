@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/store/Auth"; // Importing the auth store
-import { FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { useAuthStore } from "@/store/Auth";
+import { FaSignInAlt, FaUserPlus, FaUser, FaSignOutAlt } from "react-icons/fa";
 
 export default function Header() {
-  const { session, logout } = useAuthStore(); // Access session from the auth store
+  const { session, logout } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -26,7 +26,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && isOpen) {
+      if (window.innerWidth >= 1024 && isOpen) {
         setIsOpen(false);
       }
     };
@@ -39,22 +39,22 @@ export default function Header() {
 
   return (
     <header
-      className={`backdrop-blur-md bg-white/80 fixed w-full top-0 z-10 transition-all duration-300 ${
-        isScrolled ? "shadow-lg" : ""
+      className={`fixed w-full top-0 z-20 transition-all duration-300 ${
+        isScrolled ? "shadow-lg bg-white/80" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-6 py-4">
+      <div className="container mx-auto px-6 py-4 lg:px-10">
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent hover:from-blue-700 hover:to-blue-900 transition duration-300"
+            className="text-2xl lg:text-3xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text transition duration-300 hover:from-blue-700 hover:to-blue-900"
           >
             PROCOG
           </Link>
 
           <button
             onClick={toggleMenu}
-            className="md:hidden text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none"
+            className="lg:hidden text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none"
             aria-label="Toggle menu"
             aria-expanded={isOpen}
           >
@@ -83,25 +83,17 @@ export default function Header() {
           </button>
 
           <nav
-            className={`md:block ${
+            className={`lg:flex lg:items-center lg:space-x-6 ${
               isOpen ? "block" : "hidden"
-            } transition-all duration-300 ease-in-out`}
+            } transition-all duration-300 ease-in-out absolute lg:relative top-full left-0 w-full lg:w-auto bg-white lg:bg-transparent shadow-lg lg:shadow-none`}
           >
-            <ul
-              className={`flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2
-                ${
-                  isOpen
-                    ? "absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md shadow-xl mt-2 p-6 border-t border-gray-100"
-                    : ""
-                } 
-                md:static md:bg-transparent md:shadow-none md:border-none`}
-            >
-              {!session && (
+            <ul className="flex flex-col lg:flex-row items-center lg:space-x-4 lg:space-y-0 space-y-4 py-4 lg:py-0">
+              {!session ? (
                 <>
                   <li>
                     <Link
                       href="/login"
-                      className="flex items-center text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 px-4 py-2 rounded-lg text-sm font-medium"
+                      className="flex items-center text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 lg:px-0 lg:py-0 rounded-lg lg:rounded-none text-sm font-medium"
                     >
                       <FaSignInAlt className="mr-2 text-lg" />
                       Login
@@ -117,25 +109,25 @@ export default function Header() {
                     </Link>
                   </li>
                 </>
-              )}
-              {session && (
+              ) : (
                 <>
                   <li>
                     <Link
                       href={`/profile/${session.userId}`}
-                      className="flex items-center text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 px-4 py-2 rounded-lg text-sm font-medium"
+                      className="flex items-center text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 lg:px-0 lg:py-0 rounded-lg lg:rounded-none text-sm font-medium"
                     >
+                      <FaUser className="mr-2 text-lg" />
                       Profile
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      href="/"
+                    <button
                       onClick={() => logout()}
-                      className="flex items-center text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 px-4 py-2 rounded-lg text-sm font-medium"
+                      className="flex items-center text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 lg:px-0 lg:py-0 rounded-lg lg:rounded-none text-sm font-medium"
                     >
+                      <FaSignOutAlt className="mr-2 text-lg" />
                       Logout
-                    </Link>
+                    </button>
                   </li>
                 </>
               )}

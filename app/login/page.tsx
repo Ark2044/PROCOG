@@ -1,16 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaLock, FaEnvelope } from "react-icons/fa";
 import { useAuthStore } from "@/store/Auth";
 import { useRouter } from "next/navigation"; // Updated import
 
 export default function Login() {
-  const { login} = useAuthStore(); // Access user from the store
+  const { login, user } = useAuthStore(); // Access user from the store
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter(); // Initialize router for navigation
+
+  useEffect(() => {
+    // Redirect to dashboard if user is already logged in
+    if (user) {
+      router.push(`/dashboard/${user.$id}`);
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,8 +26,8 @@ export default function Login() {
     const password = formData.get("password");
 
     if (!email || !password) {
-        setError("Please fill all fields");
-        return;
+      setError("Please fill all fields");
+      return;
     }
 
     setIsLoading(true);
@@ -29,16 +36,15 @@ export default function Login() {
     const loginResponse = await login(email.toString(), password.toString());
 
     if (!loginResponse.success) {
-        setError(loginResponse.error?.message || "Login failed");
+      setError(loginResponse.error?.message || "Login failed");
     } else {
-        const user = useAuthStore.getState().user; // Access user from the store
-        console.log("User after login:", user);
-        router.push(`/dashboard/${user?.$id}`); // Correctly using user ID
+      const user = useAuthStore.getState().user; // Access user from the store
+      console.log("User after login:", user);
+      router.push(`/dashboard/${user?.$id}`); // Correctly using user ID
     }
 
     setIsLoading(false);
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50/30 py-16 px-4">

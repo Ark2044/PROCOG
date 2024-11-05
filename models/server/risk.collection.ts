@@ -6,8 +6,7 @@ import { databases } from './config';
 export default async function createRiskCollection() {
     // Create the risk collection with permissions
     await databases.createCollection(db, riskCollection, riskCollection, [
-        Permission.read("any"),
-        Permission.read("users"),
+        Permission.read("any"), // Remove if "users" read is sufficient
         Permission.create("users"),
         Permission.update("users"),
         Permission.delete("users"),
@@ -17,16 +16,16 @@ export default async function createRiskCollection() {
 
     // Define the enum values for action and impact
     const actionEnumValues = [
-        "mitigate",  // Example action
-        "accept",    // Example action
-        "transfer",  // Example action
-        "avoid"      // Example action
+        "mitigate",
+        "accept",
+        "transfer",
+        "avoid"
     ];
 
     const impactEnumValues = [
-        "low",       // Example impact level
-        "medium",    // Example impact level
-        "high"       // Example impact level
+        "low",
+        "medium",
+        "high"
     ];
 
     // Create attributes
@@ -36,23 +35,23 @@ export default async function createRiskCollection() {
         databases.createStringAttribute(db, riskCollection, "authorId", 100, true),
         databases.createStringAttribute(db, riskCollection, "tags", 100, true, undefined, true),
         databases.createStringAttribute(db, riskCollection, "attachmentId", 100, false),
-        databases.createEnumAttribute(db, riskCollection, "impact", impactEnumValues, true), // Impact as an enum
-        databases.createStringAttribute(db, riskCollection, "probability", 3, true), // Probability as a numerical value
-        databases.createEnumAttribute(db, riskCollection, "action", actionEnumValues, true), // Action as an enum
-        databases.createDatetimeAttribute(db, riskCollection, "created", true), // Created date
-        databases.createDatetimeAttribute(db, riskCollection, "updated", true), // Updated date
+        databases.createEnumAttribute(db, riskCollection, "impact", impactEnumValues, true),
+        databases.createIntegerAttribute(db, riskCollection, "probability", true, 0, 5, 1), // Probability as an integer attribute with range 0-5 and required
+        databases.createEnumAttribute(db, riskCollection, "action", actionEnumValues, true),
+        databases.createDatetimeAttribute(db, riskCollection, "created", true),
+        databases.createDatetimeAttribute(db, riskCollection, "updated", true),
     ]);
 
     console.log("Risk Attributes created");
 
-    // Create indexes for full-text search on title, content, impact, probability, and action
+    // Create indexes for full-text search on title and content, and key indexes for dates
     await Promise.all([
-        databases.createIndex(db, riskCollection, 'title', IndexType.Fulltext, ['title'], ['asc']),
-        databases.createIndex(db, riskCollection, 'content', IndexType.Fulltext, ['content'], ['asc']),
-        databases.createIndex(db, riskCollection, 'impact', IndexType.Fulltext, ['impact'], ['asc']),
-        databases.createIndex(db, riskCollection, 'probability', IndexType.Fulltext, ['probability'], ['asc']),
-        databases.createIndex(db, riskCollection, 'action', IndexType.Fulltext, ['action'], ['asc']),
-        databases.createIndex(db, riskCollection, 'created', IndexType.Fulltext, ['created'], ['asc']), // Index for created date
-        databases.createIndex(db, riskCollection, 'updated', IndexType.Fulltext, ['updated'], ['asc']), // Index for updated date
+        databases.createIndex(db, riskCollection, 'title', IndexType.Fulltext, ['title']),
+        databases.createIndex(db, riskCollection, 'content', IndexType.Fulltext, ['content']),
+        databases.createIndex(db, riskCollection, 'impact', IndexType.Key, ['impact']),
+        databases.createIndex(db, riskCollection, 'probability', IndexType.Key, ['probability']),
+        databases.createIndex(db, riskCollection, 'action', IndexType.Key, ['action']),
+        databases.createIndex(db, riskCollection, 'created', IndexType.Key, ['created']),
+        databases.createIndex(db, riskCollection, 'updated', IndexType.Key, ['updated']),
     ]);
 }
