@@ -17,6 +17,7 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
   const [action, setAction] = useState<
     "mitigate" | "accept" | "transfer" | "avoid"
   >("mitigate");
+  const [mitigation, setMitigation] = useState(""); // State for mitigation strategies
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,8 +54,9 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
         tags,
         attachmentId,
         impact,
-        probability: probability.toString(),
+        probability: probability,
         action,
+        mitigation: action === "mitigate" ? mitigation : "", // Include mitigation only if action is mitigate
         created: new Date().toISOString(),
         updated: new Date().toISOString(),
       });
@@ -70,6 +72,7 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
       setImpact("low");
       setProbability(3); // Set probability back to midpoint (50%)
       setAction("mitigate");
+      setMitigation(""); // Reset mitigation strategies
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError("Failed to create risk: " + err.message);
@@ -212,6 +215,22 @@ const CreateRisk: React.FC<{ onRiskCreated: () => void }> = ({
           <option value="avoid">Avoid</option>
         </select>
       </div>
+      {action === "mitigate" && ( // Conditionally render the mitigation input
+        <div className="mb-4">
+          <label
+            htmlFor="mitigation"
+            className="block text-gray-700 font-semibold mb-2"
+          >
+            How to Mitigate the Risk:
+          </label>
+          <textarea
+            id="mitigation"
+            value={mitigation}
+            onChange={(e) => setMitigation(e.target.value)}
+            className="border border-gray-300 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
       <button
         type="submit"
         className={`mt-4 w-full bg-blue-500 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 ${

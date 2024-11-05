@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import Link from "next/link"; // Import Link for navigation
 
 interface Risk {
   $id: string;
@@ -26,6 +27,7 @@ interface Risk {
   impact: "low" | "medium" | "high";
   probability: number;
   action: "mitigate" | "accept" | "transfer" | "avoid";
+  mitigation?: string; // Add mitigation strategy to Risk interface
   created: string;
   updated: string;
 }
@@ -34,9 +36,7 @@ interface RiskListProps {
   userId?: string;
 }
 
-const RiskList: React.FC<RiskListProps> = ({
-  userId,
-}) => {
+const RiskList: React.FC<RiskListProps> = ({ userId }) => {
   const [risks, setRisks] = useState<Risk[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +58,7 @@ const RiskList: React.FC<RiskListProps> = ({
         impact: doc.impact,
         probability: doc.probability,
         action: doc.action,
+        mitigation: doc.mitigation, // Fetch mitigation strategy
         created: doc.created,
         updated: doc.updated,
       }));
@@ -164,19 +165,21 @@ const RiskList: React.FC<RiskListProps> = ({
             </div>
           ) : (
             filteredAndSortedRisks().map((risk) => (
-              <RiskCard
-                key={risk.$id}
-                title={risk.title}
-                content={risk.content}
-                authorId={risk.authorId}
-                tags={risk.tags}
-                attachmentId={risk.attachmentId}
-                impact={risk.impact}
-                probability={risk.probability}
-                action={risk.action}
-                created={risk.created}
-                updated={risk.updated}
-              />
+              <Link key={risk.$id} href={`/risk/${risk.$id}`}>
+                <RiskCard
+                  title={risk.title}
+                  content={risk.content}
+                  authorId={risk.authorId}
+                  tags={risk.tags}
+                  attachmentId={risk.attachmentId}
+                  impact={risk.impact}
+                  probability={risk.probability}
+                  action={risk.action}
+                  mitigation={risk.mitigation} // Pass mitigation strategy to RiskCard
+                  created={risk.created}
+                  updated={risk.updated}
+                />
+              </Link>
             ))
           )}
         </div>

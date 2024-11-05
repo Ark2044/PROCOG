@@ -12,6 +12,7 @@ interface RiskCardProps {
   impact: "low" | "medium" | "high";
   probability: number; // Now treated as a number from 0-5
   action: "mitigate" | "accept" | "transfer" | "avoid";
+  mitigation?: string; // Add mitigation strategy prop
   created: string;
   updated: string;
 }
@@ -65,6 +66,7 @@ const RiskCard: React.FC<RiskCardProps> = ({
   impact,
   probability,
   action,
+  mitigation, // Include mitigation in props
   created,
   updated,
 }) => {
@@ -91,6 +93,14 @@ const RiskCard: React.FC<RiskCardProps> = ({
       </CardHeader>
       <CardContent>
         <p className="text-gray-600 mb-4">{content}</p>
+
+        {action === "mitigate" &&
+          mitigation && ( // Display mitigation if action is mitigate
+            <div className="mb-4">
+              <strong>Mitigation Strategy:</strong>
+              <p className="text-gray-600">{mitigation}</p>
+            </div>
+          )}
 
         <div className="flex flex-wrap gap-1 mb-4">
           {tags.map((tag) => (

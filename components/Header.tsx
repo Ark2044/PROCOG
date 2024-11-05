@@ -47,7 +47,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-2xl lg:text-3xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text transition duration-300 hover:from-blue-700 hover:to-blue-900"
+            className="text-2xl lg:text-3xl font-extrabold text-transparent bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text transition duration-300 hover:from-blue-700 hover:to-blue-900"
           >
             PROCOG
           </Link>

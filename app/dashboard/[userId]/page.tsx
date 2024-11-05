@@ -16,6 +16,19 @@ import {
   FaBan,
 } from "react-icons/fa"; // Importing icons
 
+type ImpactCount = {
+  low: number;
+  medium: number;
+  high: number;
+};
+
+type ActionCount = {
+  mitigate: number;
+  accept: number;
+  transfer: number;
+  avoid: number;
+};
+
 const Dashboard = () => {
   const { userId } = useParams();
   const userIdString = Array.isArray(userId) ? userId[0] : userId;
@@ -25,12 +38,12 @@ const Dashboard = () => {
   const [risks, setRisks] = useState<Risk[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const [impactCount, setImpactCount] = useState({
+  const [impactCount, setImpactCount] = useState<ImpactCount>({
     low: 0,
     medium: 0,
     high: 0,
   });
-  const [actionCount, setActionCount] = useState({
+  const [actionCount, setActionCount] = useState<ActionCount>({
     mitigate: 0,
     accept: 0,
     transfer: 0,
@@ -69,8 +82,9 @@ const Dashboard = () => {
       setRisks(fetchedRisks);
 
       const impactCounts = fetchedRisks.reduce(
-        (acc, risk) => {
-          acc[risk.impact] = (acc[risk.impact] || 0) + 1;
+        (acc: ImpactCount, risk) => {
+          acc[risk.impact as keyof ImpactCount] =
+            (acc[risk.impact as keyof ImpactCount] || 0) + 1;
           return acc;
         },
         { low: 0, medium: 0, high: 0 }
@@ -78,8 +92,9 @@ const Dashboard = () => {
       setImpactCount(impactCounts);
 
       const actionCounts = fetchedRisks.reduce(
-        (acc, risk) => {
-          acc[risk.action] = (acc[risk.action] || 0) + 1;
+        (acc: ActionCount, risk) => {
+          acc[risk.action as keyof ActionCount] =
+            (acc[risk.action as keyof ActionCount] || 0) + 1;
           return acc;
         },
         { mitigate: 0, accept: 0, transfer: 0, avoid: 0 }
@@ -102,19 +117,23 @@ const Dashboard = () => {
     fetchRisks();
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <p className="text-gray-600">Loading your dashboard...</p>
       </div>
     );
+  }
 
-  if (error || fetchError)
+  if (error || fetchError) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <p className="text-red-500">{error?.message || fetchError}</p>
       </div>
     );
+  }
+
+  const totalRisks = risks.length;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
@@ -136,7 +155,7 @@ const Dashboard = () => {
               <div className="bg-gray-50 p-3 rounded-lg">
                 <p className="text-sm text-gray-500">Total Risks</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {risks.length}
+                  {totalRisks}
                 </p>
               </div>
             </div>
@@ -147,24 +166,27 @@ const Dashboard = () => {
                 Distribution
               </h3>
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">High</span>
-                  <span className="text-sm font-medium text-red-600">
-                    {impactCount.high}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Medium</span>
-                  <span className="text-sm font-medium text-yellow-600">
-                    {impactCount.medium}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Low</span>
-                  <span className="text-sm font-medium text-green-600">
-                    {impactCount.low}
-                  </span>
-                </div>
+                {["high", "medium", "low"].map((level) => (
+                  <div
+                    className="flex justify-between items-center"
+                    key={level}
+                  >
+                    <span className="text-sm text-gray-600">
+                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${
+                        level === "high"
+                          ? "text-red-600"
+                          : level === "medium"
+                          ? "text-yellow-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {impactCount[level as keyof ImpactCount]}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -191,42 +213,31 @@ const Dashboard = () => {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex items-center">
-            <FaCheckCircle className="mr-3 text-green-600" />
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Mitigated</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {actionCount.mitigate}
-              </p>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex items-center">
-            <FaHandHolding className="mr-3 text-yellow-600" />
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Accepted</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {actionCount.accept}
-              </p>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex items-center">
-            <FaShareAlt className="mr-3 text-blue-600" />
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Transferred</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {actionCount.transfer}
-              </p>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex items-center">
-            <FaBan className="mr-3 text-red-600" />
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">Avoided</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {actionCount.avoid}
-              </p>
-            </div>
-          </div>
+          {Object.entries(actionCount).map(([action, count]) => {
+            const iconMap = {
+              mitigate: <FaCheckCircle className="mr-3 text-green-600" />,
+              accept: <FaHandHolding className="mr-3 text-yellow-600" />,
+              transfer: <FaShareAlt className="mr-3 text-blue-600" />,
+              avoid: <FaBan className="mr-3 text-red-600" />,
+            };
+
+            return (
+              <div
+                className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex items-center"
+                key={action}
+              >
+                {iconMap[action as keyof ActionCount]}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    {action.charAt(0).toUpperCase() + action.slice(1)}
+                  </h3>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {count}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <RiskList userId={userIdString} />
